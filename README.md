@@ -1,3 +1,5 @@
+<img width="797" alt="스크린샷 2021-10-03 오후 5 22 14" src="https://user-images.githubusercontent.com/91822619/135745821-78072e3f-6e95-4a65-9408-5bf582015ccf.png">
+
 # ShareCode
 여러 조각 코드를 공유하는 저장소
 
