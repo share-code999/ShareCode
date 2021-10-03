@@ -1,53 +1,76 @@
 
 import UIKit
 
+protocol TLabelProtocol {
+    var num: Int { get set }
+    var style: UIFont.TextStyle { get set }
+}
+
+//TestLabel
+class TLabel: UILabel, TLabelProtocol {
+    var num: Int = 0
+    var style: UIFont.TextStyle = .body
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+    }
+    
+    convenience init(frame: CGRect, fontTextStyle: UIFont.TextStyle, text: String?) {
+        self.init(frame: frame)
+        self.style = fontTextStyle
+        self.text = text
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        // This will call `awakeFromNib` in your code
+        
+    }
+    
+}
+
 
 let contentView = UIView()
-var labels: [UILabel]?
+var labels: [TLabel] = []
 
 func setting() {
     
     //create Label
-    let title1 = UILabel()
-    let title2 = UILabel()
-    let title3 = UILabel()
-    let largeTitle = UILabel()
-    let subHeadLine = UILabel()
-    let headLine = UILabel()
-    let footNote = UILabel()
-    let caption1 = UILabel()
-    let caption2 = UILabel()
-    let callout = UILabel()
-    let body = UILabel()
-    let `default` = UILabel()
+    let `default` = UILabel(frame: .zero)
+    `default`.font = UIFont.systemFont(ofSize: 17)
+    `default`.text = "default"
     
-    labels = [`default`, title1, title2, title3, largeTitle, subHeadLine, headLine, footNote, caption1, caption2, callout, body]
+    let title1 = TLabel(frame: .zero, fontTextStyle: .title1, text: "title 1")
+    let title2 = TLabel(frame: .zero, fontTextStyle: .title2, text: "title 2")
+    let title3 = TLabel(frame: .zero, fontTextStyle: .title3, text: "title 3")
+    let largeTitle = TLabel(frame: .zero, fontTextStyle: .largeTitle, text: "largetitle")
+    let subheadline = TLabel(frame: .zero, fontTextStyle: .subheadline, text: "subheadline")
+    let headline = TLabel(frame: .zero, fontTextStyle: .headline, text: "headline")
+    let footnote = TLabel(frame: .zero, fontTextStyle: .footnote, text: "footnote")
+    let caption1 = TLabel(frame: .zero, fontTextStyle: .caption1, text: "cpation 1")
+    let caption2 = TLabel(frame: .zero, fontTextStyle: .caption2, text: "caption 2")
+    let callout = TLabel(frame: .zero, fontTextStyle: .callout, text: "callout")
+    let body = TLabel(frame: .zero, fontTextStyle: .body, text: "body")
     
-    //set size
+    //append TLabel -- 넣은 순서대로 표시됨
+    appendLabel(title1)
+    appendLabel(title2)
+    appendLabel(title3)
+    appendLabel(largeTitle)
+    appendLabel(subheadline)
+    appendLabel(headline)
+    appendLabel(footnote)
+    appendLabel(caption1)
+    appendLabel(caption2)
+    appendLabel(callout)
+    appendLabel(body)
+    
+    //set contentView frame
     let width = UIScreen.main.bounds.width/4
-    let height = UIScreen.main.bounds.height/2
-    var yPoint: CGFloat = 0
+    let height = UIScreen.main.bounds.height/3
     contentView.frame = CGRect(origin: .zero, size: CGSize(width: width, height: height))
     
-    for label in labels! {
-        label.frame
-        = CGRect(x: 0, y: yPoint, width: width, height: 30)
-        yPoint += label.frame.height
-    }
-    
-    //set text
-    title1.text = "title 1"
-    title2.text = "title 2"
-    title3.text = "title 3"
-    largeTitle.text = "large title"
-    subHeadLine.text = "sub head line"
-    headLine.text = "head line"
-    footNote.text = "foot note"
-    caption1.text = "caption 1"
-    caption2.text = "caption 2"
-    callout.text = "callout"
-    body.text = "body"
-    `default`.text = "default"
     
     //set color
     contentView.backgroundColor = .white
@@ -55,45 +78,51 @@ func setting() {
     title2.backgroundColor = .orange
     title3.backgroundColor = .yellow
     largeTitle.backgroundColor = .green
-    subHeadLine.backgroundColor = .blue
-    headLine.backgroundColor = .brown
-    footNote.backgroundColor = .cyan
+    subheadline.backgroundColor = .blue
+    headline.backgroundColor = .brown
+    footnote.backgroundColor = .cyan
     caption1.backgroundColor = .lightGray
     caption2.backgroundColor = .magenta
     callout.backgroundColor = .purple
     body.backgroundColor = .gray
     `default`.backgroundColor = .darkGray
     
-    //add label
-    contentView.addSubViews(labels!)
     
     
-    //self.setLabelFontStyle([label], fontStyle: .callout)
-    //font size
-    let labelAndStyles: [UILabel:UIFont.TextStyle] = [
-        title1:.title1,
-        title2:.title2,
-        title3:.title3,
-        largeTitle:.largeTitle,
-        subHeadLine:.subheadline,
-        headLine:.headline,
-        footNote:.footnote,
-        caption1:.caption1,
-        caption2:.caption2,
-        callout:.callout,
-        body:.body
-    ]
-    `default`.font = UIFont.systemFont(ofSize: 17)
-    
-    setLabelFontStyles(labelAndStyles)
-    
+    setLabelFontStyles(labels, callback: { labels in
+        
+        //set rect and add
+        
+        let defaultSize = `default`.sizeThatFits(contentView.frame.size)
+        `default`.frame = CGRect(origin: .zero, size: defaultSize)
+        contentView.addSubview(`default`)
+        
+        var yPoint: CGFloat = `default`.frame.height
+        for label in labels {
+            let newSize = label.sizeThatFits(contentView.frame.size)
+            label.frame = CGRect(origin: CGPoint(x: 0, y: yPoint), size: newSize)
+            yPoint += label.frame.height
+            contentView.addSubview(label)
+        }
+    })
 }
 
-func setLabelFontStyles(_ labelAndStyles: [UILabel:UIFont.TextStyle]) {
-    for labelAndStyle in labelAndStyles {
-        labelAndStyle.key.font = UIFont.preferredFont(forTextStyle: labelAndStyle.value)
-        labelAndStyle.key.adjustsFontForContentSizeCategory = true
+func appendLabel(_ label: TLabel) {
+    //set num
+    label.num = labels.count
+    //append
+    labels.append(label)
+}
+
+func setLabelFontStyles(_ tLabels: [TLabel], callback: @escaping ([UILabel]) -> Void) {
+    var labels: [TLabel] = []
+    for tLabel in tLabels {
+        labels.append(tLabel)
+        tLabel.font = UIFont.preferredFont(forTextStyle: tLabel.style)
+        tLabel.adjustsFontForContentSizeCategory = true
     }
+    labels.sort(by: {$0.num < $1.num})
+    callback(labels)
 }
 
 setting()
